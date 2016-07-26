@@ -5,7 +5,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -18,19 +17,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        ConfigurationInfo info = am.getDeviceConfigurationInfo();
-        boolean supportES2 = (info.reqGlEsVersion >= 0x20000);
-        if (supportES2) {
-            MyGlRenderer renderer = new MyGlRenderer();
-            glSurfaceView = new GLSurfaceView(this);
-            glSurfaceView.setEGLContextClientVersion(2);
-            glSurfaceView.setRenderer(renderer);
+        if (detectOpenGlES3()) {
+            glSurfaceView = new MyGlSUrfaceView(this);
             setContentView(glSurfaceView);
 
         } else {
-            Log.e("OpenGLES2:", "Your device does'nt support elgs2 ");
+            Log.e("OpenGLES3:", "Your device does'nt support openGl es 3 ");
+            finish();
         }
 
     }
@@ -45,5 +38,11 @@ public class MainActivity extends Activity {
     protected void onPause() {
         super.onPause();
         glSurfaceView.onPause();
+    }
+
+    private boolean detectOpenGlES3(){
+        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        ConfigurationInfo info = am.getDeviceConfigurationInfo();
+        return (info.reqGlEsVersion >= 0x30000);
     }
 }
